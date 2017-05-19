@@ -1,0 +1,42 @@
+files:
+  file1.md:
+    author:
+    - {affiliation: University of Somewhere, name: John Doe}
+    followups: [file2.md, file3.md]
+    tags: [example, first, test]
+    targets: [file2.md, file3.md]
+    title: File 1
+  file2.md:
+    author:
+    - {affiliation: University of Somewhere, name: John Doe}
+    followups: []
+    tags: [example, second]
+    targets: ['http://example.com', file3.md]
+    title: File 2
+  file3.md:
+    author:
+    - {affiliation: University of Somewhere, name: John Doe}
+    followups: []
+    tags: [example, third]
+    targets: [file1.md]
+    title: File 3
+  onlies/markdown-only.md:
+    followups: []
+    tags: []
+    targets: ['http://pandoc.org/README.html#yaml_metadata_block', ../file2.md]
+    title: untitled
+  onlies/yaml-test.md:
+    author:
+    - {affiliation: University of Somewhere, name: John Doe}
+    followups: []
+    tags: [example, pureyaml]
+    targets: []
+    title: Pure Yaml
+  subdir/file4.md:
+    author:
+    - {affiliation: University of Somewhere, name: John Doe}
+    followups: [../file1.md]
+    tags: [example, fourth]
+    targets: [../file1.md]
+    title: File 4
+timestamp: 1495195313.127109

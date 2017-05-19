@@ -1,0 +1,5 @@
+# This is a settings file for Zettels
+# see https://github.com/sthesing/Zettels
+rootdir: examples/Zettelkasten
+indexfile: examples/index.yaml
+outputformat: '{0[0]:<50}| {0[1]}'
