@@ -87,11 +87,20 @@ class Zettelkasten:
             - Path of the followup relative to rootdir
         """
         # First, absolute path of zettel
-        zettel = os.path.abspath(zettel)
+        #zettel = os.path.abspath(zettel)
+        
+        # In fact, we need the real path (desolving symlinks)
+        zettel = os.path.realpath(zettel)
+        logger.debug("Real path to ZETTEL: " + str(zettel))
         
         # Make the path to the file relative to the root directory
-        zettel = os.path.relpath(zettel, self.rootdir)
+        # To do that, we need the real path, too
+        logger.debug("Real path to root Dir: " + str(os.path.realpath(self.rootdir)))
+        
+        zettel = os.path.relpath(zettel, os.path.realpath(self.rootdir))
+        logger.debug("Relative path to ZETTEL: " + str(zettel))
         zetdir = os.path.dirname(zettel)
+        logger.debug("Dirname of ZETTEL: " + str(zetdir))
         
         followups = []
         for followup in self.index['files'][zettel]['followups']:
@@ -118,11 +127,11 @@ class Zettelkasten:
             - Title of the target
             - Path of the target relative to rootdir
         """
-        # First, absolute path of zettel
-        zettel = os.path.abspath(zettel)
+        # First, real path of zettel
+        zettel = os.path.realpath(zettel)
         
         # Make the path to the file relative to the root directory
-        zettel = os.path.relpath(zettel, self.rootdir)
+        zettel = os.path.relpath(zettel, os.path.realpath(self.rootdir))
         zetdir = os.path.dirname(zettel)
         
         targets = []
@@ -149,11 +158,11 @@ class Zettelkasten:
             - Title of the incoming link's source
             - Path of the source relative to rootdir
         """
-        # First, absolute path of zettel
-        zettel = os.path.abspath(zettel)
+        # First, real path of zettel
+        zettel = os.path.realpath(zettel)
         
         # Make the path to the file relative to the root directory
-        zettel = os.path.relpath(zettel, self.rootdir)
+        zettel = os.path.relpath(zettel, os.path.realpath(self.rootdir))
         zetdir = os.path.dirname(zettel)
         
         # Start with an empty list of sources
