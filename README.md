@@ -43,6 +43,21 @@ Wandel. Opladen: Westdeutscher Verlag. pp. 22-28
 - Thomas Schlesinger: [Wissen konservieren und kuratieren mit dem Zettelkasten nach Niklas Luhmann](http://www.schlesisblog.de/2016/09/wissen-konservieren-und-kuratieren-mit.html)
 - Universität Bielefeld: Video - [Einblicke in das System der Zettel - Geheimnis um Niklas Luhmanns Zettelkasten](https://youtu.be/4veq2i3teVk)
 
+## What, no GUI?
+
+True. A GUI for querying the index would be nice. However, as such, Zettels
+doesn't provide one. It is intended to be used in a toolchain of UNIX-tools.
+
+I myself edit my Zettelkasten in my favourite text editor and have created 
+a little module that allows me to query its index from there. So, if you use
+Textadept or don't care which text editor you use, have a look at 
+[ta-zettels](https://github.com/sthesing/ta-zettels).
+
+### Alternatives
+
+If you're looking for a GUI, all-in-one approach to implementing Luhmann's idea
+into software, I can recommend Daniel Lüdecke's [Zettelkasten](http://zettelkasten.danielluedecke.de/) (sjPlot/Zettelkasten).
+
 ## Installation and setup
 
 1. Clone or download the repository. 
@@ -135,11 +150,6 @@ setting to
 See the 
 [Python Format String Syntax](https://docs.python.org/3.6/library/string.html#format-string-syntax) 
 for details.
-
-## Alternatives
-
-If you're looking for a GUI, all-in-one approach to implementing Luhmann's idea
-into software, I can recommend Daniel Lüdecke's [Zettelkasten](http://zettelkasten.danielluedecke.de/) (sjPlot/Zettelkasten).
 
 ## Requirements
 
