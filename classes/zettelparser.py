@@ -21,6 +21,7 @@ import logging
 import os
 import shlex
 import subprocess
+import sys
 import time
 import yaml
 
@@ -86,7 +87,13 @@ class Zettelparser:
         if not files:
             grepoutput = None
         else:
-            grepcmd = "grep --exclude=\"*~\" -n -E -o -f resources/zettels-grep-patterns "
+            # Path of the patterns file is 
+            # [installation directory]/resources/zettels-grep-patterns
+            patterns_file = os.path.join(sys.path[0], 
+                                         "resources", 
+                                         "zettels-grep-patterns ")
+            # pass it to grep
+            grepcmd = "grep --exclude=\"*~\" -n -E -o -f " + patterns_file
             grepoutput = subprocess.check_output(shlex.split(grepcmd) + files)
         
         return files, grepoutput

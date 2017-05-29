@@ -2,7 +2,7 @@
 Zettels is a command line tool implementing Niklas Luhmann's system of a 
 "Zettelkasten".
 
-
+It's still in alpha stage and probably very buggy.
 
 ## What does Zettels do?
 
