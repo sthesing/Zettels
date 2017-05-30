@@ -22,7 +22,7 @@
 Zettels is a command line tool implementing Niklas Luhmann's system of a "Zettelkasten".
 """
 
-__version__ = '0.1.0'
+__version__ = '0.2.0'
 __author__  = 'Stefan Thesing'
 
 # Libraries
@@ -35,9 +35,9 @@ import xdg.BaseDirectory
 import yaml
 
 # local imports
-from classes.zettelparser import Zettelparser
-from classes.zettelkasten import Zettelkasten
-import setup
+from zettelparser import Zettelparser
+from zettelkasten import Zettelkasten
+import zettels_setup as setup
 
 #################################
 # Internal methods used by main #

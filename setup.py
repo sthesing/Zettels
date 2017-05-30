@@ -1,76 +1,103 @@
-#! /usr/bin/env python3
-
-##This file is part of Zettels.
-##
-##Zettels is free software: you can redistribute it and/or modify
-##it under the terms of the GNU General Public License as published by
-##the Free Software Foundation, either version 3 of the License, or
-##(at your option) any later version.
-##
-##Zettels is distributed in the hope that it will be useful,
-##but WITHOUT ANY WARRANTY; without even the implied warranty of
-##MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-##GNU General Public License for more details.
-##
-##You should have received a copy of the GNU General Public License
-##along with Zettels. If not, see http://www.gnu.org/licenses/.
+"""A setuptools based setup module.
 
 """
-Setup tool for Zettels
-"""
-import os
-import xdg.BaseDirectory
 
-def generate_settings():
-    """
-    Interactively generate settings.
-    """
-    # Get the standard directory for settings. Create it, if not present.
-    settings_base_dir = xdg.BaseDirectory.save_config_path('Zettels')
-    
-    # Defaults
-    rootdir = os.getcwd()
-    indexfile = settings_base_dir + '/index.yaml'
-    outputformat = '{0[0]:<50}| {0[1]}'
-    
-    # Ask the user
-    
-    # Root dir
-    print('Please specify the root directory of your Zettelkasten.')
-    print('It will contain the Zettel files.')
-    rootdir = input("Default is the current directory: '" 
-        + rootdir + "': ") or rootdir
+# Always prefer setuptools over distutils
+from setuptools import setup, find_packages
+# To use a consistent encoding
+from codecs import open
+from os import path
+
+version = '0.2.0'
+
+here = path.abspath(path.dirname(__file__))
+
+# Get the long description from the README file
+try:
+    import pypandoc
+    long_description = pypandoc.convert('README.md', 'rst')
+except(IOError, ImportError):
+    with open(path.join(here, 'README.md'), encoding='utf-8') as f:
+        long_description = f.read()
+
+setup(
+    name='zettels',
+    version=version,
+    description='A command line tool implementing Luhmann\'s system of a "Zettelkasten".',
+    long_description=long_description,
+
+    # The project's main homepage.
+    url='https://github.com/sthesing/Zettels',
+
+    # Author details
+    author='Stefan Thesing',
+    author_email='software@webdings.de',
+
+    # Choose your license
+    license='GPLv3+',
+
+    # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
+    classifiers=[
+        # How mature is this project? Common values are
+        #   3 - Alpha
+        #   4 - Beta
+        #   5 - Production/Stable
+        'Development Status :: 3 - Alpha',
+
+        # Indicate who your project is intended for
+        'Intended Audience :: Science/Research',
+        'Intended Audience :: Education',
+        'Topic :: Text Processing :: Indexing',
+        'Topic :: Other/Nonlisted Topic',
         
-    # Index file
-    print('Please specify the file containing the index of your Zettelkasten.')
-    indexfile = input("Default is: '" + indexfile + "': ") or indexfile
- 
-    print()
-    print("These are your settings:")
-    print("------------------------")
-    print("Root directory:", rootdir)
-    print("Index file:", indexfile)
 
-    correct = input("Are these correct? y/n, Default is 'y': ")
-    if correct == "n" or correct == "N":
-        startover = input("Do you want so start over? y/n, Default is y: ")
-        if startover == "n" or startover == "N":
-            exit()
-        else:
-            print("Starting over...")
-            print()
-            generate_settings()
-    else:
-        f = open(os.path.join(settings_base_dir, 'zettels.cfg.yaml'), 'w')
-        f.write("# This is a settings file for Zettels\n")
-        f.write("# see https://github.com/sthesing/Zettels\n")
-        f.write('rootdir: ' + rootdir + '\n')
-        f.write('indexfile: ' + indexfile + '\n')
-        f.write('outputformat: \'' + outputformat + '\'')
-        f.close()
+        # Pick your license as you wish (should match "license" above)
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+
+        # Specify the Python versions you support here. In particular, ensure
+        # that you indicate whether you support Python 2, Python 3 or both.
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+    ],
+
+    # What does your project relate to?
+    keywords='notetaking zettelkasten',
+
+    # You can just specify the packages manually here if your project is
+    # simple. Or you can use find_packages().
+    #packages=find_packages(exclude=['contrib', 'docs', 'tests']),
+    packages = ['zettels'],
     
-    print("Settings written to '" + os.path.join(settings_base_dir, 'zettels.cfg.yaml') + "'.") 
-    exit()
+    # List run-time dependencies here.  These will be installed by pip when
+    # your project is installed. For an analysis of "install_requires" vs pip's
+    # requirements files see:
+    # https://packaging.python.org/en/latest/requirements.html
+    install_requires=['PyYAML'],
 
-if __name__ == "__main__":
-    generate_settings()
+    # List additional groups of dependencies here (e.g. development
+    # dependencies). You can install these using the following syntax,
+    # for example:
+    # $ pip install -e .[dev,test]
+    extras_require={
+        'dev': ['check-manifest', 'pypandoc'],
+        'test': ['coverage'],
+    },
+
+    # If there are data files included in your packages that need to be
+    # installed, specify them here.  If using Python 2.6 or less, then these
+    # have to be included in MANIFEST.in as well.
+    package_data={
+        'zettels': ['resources/*', 'examples/*'],
+    },
+
+    # To provide executable scripts, use entry points in preference to the
+    # "scripts" keyword. Entry points provide cross-platform support and allow
+    # pip to create the appropriate form of executable for the target platform.
+    entry_points={
+        'console_scripts': [
+            'zettels = zettels.zettels:main',
+        ],
+    },
+)

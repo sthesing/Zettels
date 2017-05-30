@@ -61,7 +61,7 @@ into software, I can recommend Daniel Lüdecke's [Zettelkasten](http://zettelkas
 ## Installation and setup
 
 1. Clone or download the repository. 
-2. Run `setup.py` or `zettels.py --setup` – follow the interactive setup process
+2. Run `zettels_setup.py` or `zettels.py --setup` – follow the interactive setup process
 3. Run `zettels.py` once without any parameters to initially build the index.
 
 ## Usage
