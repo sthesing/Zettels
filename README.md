@@ -60,17 +60,17 @@ into software, I can recommend Daniel Lüdecke's [Zettelkasten](http://zettelkas
 
 ## Installation and setup
 
-1. Clone or download the repository. 
-2. Run `zettels_setup.py` or `zettels.py --setup` – follow the interactive setup process
-3. Run `zettels.py` once without any parameters to initially build the index.
+1. Install using pip (or pip3, depending on your OS): `pip install zettels`
+2. Run `zettels --setup` – follow the interactive setup process
+3. Run `zettels` once without any parameters to initially build the index.
 
 ## Usage
 
-Run `zettels.py -h` for a complete list of options. Some examples:
+Run `zettels -h` for a complete list of options. Some examples:
 
 Build or update the index:
 ```
-zettels.py
+zettels
 ```
 
 ### Querying the index
@@ -79,33 +79,33 @@ Zettels has the `query` (shorthand `q`) subcommand to query the index.
 
 Show a list of all zettels:
 ```
-zettels.py query
+zettels query
 ```
 Show a list of all zettels, but update the index first:
 ```
-zettels.py query -u
+zettels query -u
 ```
 Show info about a specific zettel, e.g. file1.md:
 ```
-zettels.py query file1.md
+zettels query file1.md
 ```
 Show a list of followups of a specific zettel, e.g. file1.md:
 ```
-zettels.py query -f file1.md
+zettels query -f file1.md
 ```
 Show a list of zettels a specific zettel links to, e.g. file1.md:
 ```
-zettels.py query -t file1.md
+zettels query -t file1.md
 ```
 Show a list of zettels linking to a specific zettel, e.g. file1.md:
 ```
-zettels.py query -i file1.md
+zettels query -i file1.md
 ```
 
 ### Try it with example data
 Run e.g.
 ```
-zettels.py q -s examples/zettels.cfg.yaml examples/Zettelkasten/file1.md
+zettels q -s examples/zettels.cfg.yaml examples/Zettelkasten/file1.md
 ```
 
 ## Zettel format

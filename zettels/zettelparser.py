@@ -19,6 +19,7 @@
 import linecache
 import logging
 import os
+import pkg_resources
 import shlex
 import subprocess
 import sys
@@ -89,9 +90,12 @@ class Zettelparser:
         else:
             # Path of the patterns file is 
             # [installation directory]/resources/zettels-grep-patterns
-            patterns_file = os.path.join(sys.path[0], 
-                                         "resources", 
-                                         "zettels-grep-patterns ")
+            #patterns_file = os.path.join(sys.path[0], 
+            #                             "resources", 
+            #                             "zettels-grep-patterns ")
+            
+            patterns_file = pkg_resources.resource_filename('zettels', 'resources/zettels-grep-patterns')
+            
             # pass it to grep
             grepcmd = "grep --exclude=\"*~\" -n -E -o -f " + patterns_file
             grepoutput = subprocess.check_output(shlex.split(grepcmd) + files)
