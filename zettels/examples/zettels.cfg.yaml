@@ -4,3 +4,8 @@ rootdir: examples/Zettelkasten
 indexfile: examples/index.yaml
 outputformat: '{0[1]}'
 prettyformat: '{0[0]:<30}| {0[1]}'
+ignore: {
+    #temporal files, hidden files
+    '*~',
+    '.*',
+}

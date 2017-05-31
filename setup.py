@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-version = '0.3.0-exp'
+version = '0.3.0'
 
 here = path.abspath(path.dirname(__file__))
 
@@ -76,7 +76,7 @@ setup(
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
-    install_requires=['PyYAML'],
+    install_requires=['PyYAML', 'pathspec'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,

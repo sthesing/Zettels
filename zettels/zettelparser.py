@@ -19,6 +19,7 @@
 import linecache
 import logging
 import os
+import pathspec
 import pkg_resources
 import shlex
 import subprocess
@@ -45,7 +46,7 @@ class Zettelparser:
     """
     
     @staticmethod
-    def _list_files(dirname):
+    def _list_files_bak(dirname):
         # Returns a list of files in the specified directory        
         files = []
         for root, _, filenames in os.walk(dirname):
@@ -53,13 +54,48 @@ class Zettelparser:
                 if not f.endswith("~"):
                     files.append(os.path.join(root, f))
         return files
+    
+    @staticmethod
+    def _ignorify(patterns=['*~']):
+        """
+        pathspec implements gitignore style pattern matching. However, 
+        it doesn't ignore patterns, it *matches* patterns.
+        So every pattern needs to be reversed by adding a '!' (or removing)
+        it.
+        """
+        patterns = list(patterns)
+        # First, add everything
+        reversed_patterns = ['*']
+        
+        # Then reverse every single pattern
+        for p in patterns:
+            # If the pattern starts with '!', remove the '!'
+            if p.startswith('!'):
+                reversed_patterns.append(p.replace('!', '', 1))
+            else:
+                reversed_patterns.append('!' + p)
+        
+        return reversed_patterns
+    
+    @staticmethod
+    def _list_files(dirname, ignore_patterns=None):
+        # Reverse pattern
+        ignore_patterns = Zettelparser._ignorify(ignore_patterns)
+        
+        spec = pathspec.PathSpec.from_lines('gitwildmatch', ignore_patterns)
+        matches = spec.match_tree(dirname)
+        files = []
+        for match in matches:
+            files.append(os.path.join(dirname, match))
+        
+        return files
         
     @staticmethod
-    def _get_updated_files(dirname, index=None):
+    def _get_updated_files(dirname, index=None, ignore_patterns=None):
 
         
         #Get the current list of files
-        files = Zettelparser._list_files(dirname)
+        files = Zettelparser._list_files(dirname, ignore_patterns)
         
         if index:
             for f in files:
@@ -79,10 +115,10 @@ class Zettelparser:
         return files
         
     @staticmethod
-    def _grep_files(dirname, index=None):
+    def _grep_files(dirname, index=None, ignore_patterns=None):
         # Calls grep to get the yaml-Blocks and markdown-Links as specified
         # in the file "zettels-grep-patterns"
-        files = Zettelparser._get_updated_files(dirname, index)
+        files = Zettelparser._get_updated_files(dirname, index, ignore_patterns)
         
         # Call grep only, if there are any updated files
         if not files:
@@ -137,7 +173,7 @@ class Zettelparser:
         return index
     
     @staticmethod
-    def update_index(rootdir, index=None):
+    def update_index(rootdir, index=None, ignore_patterns=None):
         """
         Update/build an index for the specified directory.
         
@@ -151,11 +187,12 @@ class Zettelparser:
 
         :param rootdir: the directory containing the Zettel files.
         :param index: An existing index, if available.
+        :param ignore_patterns: a list of gitignore-style patterns to be ignored by grep
         :return: The index in dictionary format. 
         """
         logger.debug("Updating index:")
         # get the list of updated files and the grep output
-        files, grepoutput = Zettelparser._grep_files(rootdir, index)
+        files, grepoutput = Zettelparser._grep_files(rootdir, index, ignore_patterns)
         
         # generate a empty index, if necessary
         if not index:

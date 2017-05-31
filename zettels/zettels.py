@@ -22,7 +22,7 @@
 Zettels is a command line tool implementing Niklas Luhmann's system of a "Zettelkasten".
 """
 
-__version__ = '0.3.0-exp'
+__version__ = '0.3.0'
 __author__  = 'Stefan Thesing'
 
 # Libraries
@@ -105,9 +105,10 @@ def _read_settings(f):
                 exit()
             indexfile = settings['indexfile']
             indexfile = os.path.abspath(os.path.expanduser(indexfile))
-            outputformat = settings['outputformat']
-            prettyformat = settings['prettyformat']
-            return rootdir, indexfile, outputformat, prettyformat
+            outputformat    = settings['outputformat']
+            prettyformat    = settings['prettyformat']
+            ignore_patterns = settings['ignore']
+            return rootdir, indexfile, outputformat, prettyformat, ignore_patterns
         else:
             print("There seems to be a problem with your settings \
                 file. Zettels expected to receive a dictionary or other \
@@ -134,13 +135,13 @@ def _query(args):
     
     # Next, let's read the settings file. _read_settings(settings) does the
     # error handling
-    rootdir, indexfile, outputformat, prettyformat = _read_settings(args.settings)
+    rootdir, indexfile, outputformat, prettyformat, ignore_patterns = _read_settings(args.settings)
     # If we're still running, we have valid settings.
     logger.debug("Root dir: " + rootdir)
     logger.debug("Index file: " + indexfile)
     
     if args.update:
-        index = Zettelparser.update_index(rootdir)
+        index = Zettelparser.update_index(rootdir, ignore_patterns=ignore_patterns)
         logger.debug("Writing index to file " + indexfile)
         Zettelparser.write_index(index, indexfile)
         logger.debug("Done")
@@ -217,12 +218,12 @@ def _parse(args):
 
     # Next, let's read the settings file. _read_settings(settings) does the
     # error handling
-    rootdir, indexfile, _, _ = _read_settings(args.settings)
+    rootdir, indexfile, _, _, ignore_patterns = _read_settings(args.settings)
     # If we're still running, we have valid settings.
     logger.debug("Root dir: " + rootdir)
     logger.debug("Index file: " + indexfile)
     
-    index = Zettelparser.update_index(rootdir)
+    index = Zettelparser.update_index(rootdir, ignore_patterns=ignore_patterns)
     logger.debug("Writing index to file " + indexfile)
     Zettelparser.write_index(index, indexfile)
     logger.debug("Done")
