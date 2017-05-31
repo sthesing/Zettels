@@ -165,14 +165,26 @@ def _query(args):
     zk = Zettelkasten(index, rootdir)
     # Now, let's do what we're told:
     
-    # Did the user specify a non standard output-format?
-    if args.output:
-        outputformat = args.output
-    elif args.pretty:
-        outputformat = prettyformat
+    if not args.Zettel:
     # When no Zettel argument is given, this implies the pretty flag, 
     # but only of -o is not used.
-    elif not args.Zettel:
+        args.pretty = True
+    else:
+    # If no output flag is set, all them get set. This also implies
+    # the pretty flag
+        if not args.followups and not args.targets and not args.incoming:
+            # If no output flag is set, all them get set. The pretty flag
+            # as well.
+            args.followups = True
+            args.targets = True
+            args.incoming = True
+            args.pretty = True
+    
+    # Did the user set the output flag?
+    if args.output:
+        outputformat = args.output
+    #Has the pretty flag been set (explicitly or implicitly)?
+    elif args.pretty:
         outputformat = prettyformat
       
     if not args.Zettel:
@@ -180,34 +192,39 @@ def _query(args):
                                             outputformat=outputformat):
             print(entry)
     else:
-        if not args.followups and not args.targets and not args.incoming:
-            # If no output flag is set, all them get set. The pretty flag
-            # as well.
-            args.followups = True
-            args.targets = True
-            args.incoming = True
-            outputformat = prettyformat
-        
-        if args.followups:
-            print("Followups:")
-            for entry in zk.get_followups_of(args.Zettel, 
-                                             as_output=True, 
-                                             outputformat=outputformat):
-                print(entry)
-        
-        if args.targets:
-            print("Targets:")
-            for entry in zk.get_targets_of(args.Zettel, 
-                                           as_output=True,
-                                           outputformat=outputformat):
-                print(entry)
-        
-        if args.incoming:
-            print("Incoming links:")
-            for entry in zk.get_incoming_of(args.Zettel, 
-                                            as_output=True,
-                                            outputformat=outputformat):
-                print(entry)
+        # In case our zettel arguments came from a pipe via stdin,
+        # it's not a list, but a io.TextIOWrapper. We'll want to know
+        # it's length before iterating through it, so convert it into 
+        # a list.
+        args.Zettel = list(args.Zettel)
+        for zettel_arg in args.Zettel:
+            # In case our zettel arguments came from a pipe via stdin,
+            # they each end with a line break. We have to strip those away.
+            zettel_arg = zettel_arg.rstrip()
+            # If we're dealing with more than one zettel argument, let's 
+            # structure output a bit:
+            if len(args.Zettel) > 1: print("[", zettel_arg, "]")
+                
+            if args.followups:
+                if args.pretty: print("[", "- Followups:" , "]")
+                for entry in zk.get_followups_of(zettel_arg, 
+                                                 as_output=True, 
+                                                 outputformat=outputformat):
+                    print(entry)
+            
+            if args.targets:
+                if args.pretty: print("[", "- Targets:" , "]")
+                for entry in zk.get_targets_of(zettel_arg, 
+                                               as_output=True,
+                                               outputformat=outputformat):
+                    print(entry)
+            
+            if args.incoming:
+                if args.pretty: print("[", "- Incoming links:" , "]")
+                for entry in zk.get_incoming_of(zettel_arg, 
+                                                as_output=True,
+                                                outputformat=outputformat):
+                    print(entry)
 
 def _parse(args):
     logger.debug(args)
@@ -274,10 +291,21 @@ def main():
     
     group_general = q_parser.add_argument_group('General options')
     # One (optional) postional argument, which is a Zettel
+    
+    if sys.stdin.isatty():
+        # Interactive, don't wait for the user if he or she hasn't
+        # given any arguments
+        zettel_arg_default = None
+    else:
+        # Piped, let's see what sys.stdin gives us.
+        zettel_arg_default = sys.stdin
+    
     group_general.add_argument('Zettel', 
                         metavar='ZETTEL', 
-                        nargs='?',
-                        help='Optional: specify a Zettel file. If no Zettel \
+                        nargs='*',
+                        default=zettel_arg_default,
+                        help='Optional: specify one or several Zettel \
+                        files. If no Zettel \
                         file is given, zettels will list the titles and \
                         paths of all the Zettels in the Zettelkasten \
                         (implying the --pretty flag).')
@@ -286,17 +314,17 @@ def main():
     
     # Output arguments
     group_output = q_parser.add_argument_group('Output options', 'Flags to \
-        determine the output. They only take effect if the ZETTEL argument is \
-        given. If none of these flags is set, the program outputs the an \
-        overview over the specified Zettel, equivalent to setting all of \
-        these flags. Furthermore, setting none of these flags implies the \
-        --pretty flag for output format.')
+        determine the output. They only take effect if at least one \
+        ZETTEL argument is given. If none of these flags is set, the \
+        program outputs the an overview over the specified Zettel(s), \
+        equivalent to setting all of these flags. Furthermore, this \
+        overview implicitly sets the --pretty flag for output format.')
     group_output.add_argument('-f', '--followups', action="store_true",
-        help='Output followups of the specified Zettel.')
+        help='Output followups of the specified Zettel(s).')
     group_output.add_argument('-t', '--targets', action="store_true",
-        help='Show the targets of hyperlinks in the specified Zettel.')
+        help='Show the targets of hyperlinks in the specified Zettel(s).')
     group_output.add_argument('-i', '--incoming', action="store_true",
-        help='Show all Zettels that link to the specified Zettel.')
+        help='Show all Zettels that link to the specified Zettel(s).')
     
     # Output format
     # It actually should be a mutually exclusive group, but that currently

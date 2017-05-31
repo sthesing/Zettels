@@ -46,16 +46,6 @@ class Zettelparser:
     """
     
     @staticmethod
-    def _list_files_bak(dirname):
-        # Returns a list of files in the specified directory        
-        files = []
-        for root, _, filenames in os.walk(dirname):
-            for f in filenames:
-                if not f.endswith("~"):
-                    files.append(os.path.join(root, f))
-        return files
-    
-    @staticmethod
     def _ignorify(patterns=['*~']):
         """
         pathspec implements gitignore style pattern matching. However, 

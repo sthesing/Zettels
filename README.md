@@ -90,6 +90,10 @@ Show info about a specific zettel, e.g. file1.md:
 ```
 zettels query file1.md
 ```
+Show info about two zettels, e.g. file1.md and file2.md:
+```
+zettels query file1.md file2.md
+```
 Show a list of followups of a specific zettel, e.g. file1.md:
 ```
 zettels query -f file1.md
@@ -101,6 +105,12 @@ zettels query -t file1.md
 Show a list of zettels linking to a specific zettel, e.g. file1.md:
 ```
 zettels query -i file1.md
+```
+And finally, a bit of fun with pipes:
+Let's say you have found want to see which zettels apart from file1.md 
+itself link to the followups of file1.md:
+```
+zettels query -f file1.md | zettels query -i | grep -v file1.md
 ```
 
 ### Try it with example data
