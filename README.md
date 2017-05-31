@@ -168,3 +168,4 @@ for details.
 - [grep](https://www.gnu.org/software/grep/) – Your Python runtime must be
 able to find and execute grep.
 - [PyYaml](http://pyyaml.org/)
+- [pathspec](https://pypi.python.org/pypi/pathspec)>=0.5.0
