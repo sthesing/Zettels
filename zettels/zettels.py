@@ -22,7 +22,7 @@
 Zettels is a command line tool implementing Niklas Luhmann's system of a "Zettelkasten".
 """
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 __author__  = 'Stefan Thesing'
 
 # Libraries
@@ -35,15 +35,23 @@ import xdg.BaseDirectory
 import yaml
 
 # local imports
-from zettelparser import Zettelparser
-from zettelkasten import Zettelkasten
-import zettels_setup as setup
+from zettels.zettelparser import Zettelparser
+from zettels.zettelkasten import Zettelkasten
+import zettels.zettels_setup as setup
+
+# Module variables
+settings_base_dir = xdg.BaseDirectory.save_config_path('Zettels')
+logger = logging.getLogger('Zettels')
+
 
 #################################
 # Internal methods used by main #
 #################################
 
 def _connect_dev_arguments(parser):
+    # Standard settings dir:
+    
+    
     # Command line arguments that are "Developer options" should be available
     # in all subcommands. To make it available to both parser and subparsers,
     # and to avoid redundant code, this function connects them to the specified
@@ -221,6 +229,9 @@ def _parse(args):
 #################################
 
 if __name__ == "__main__":
+    main()
+    
+def main():
     """
     Zettels is a little tool to index markdown files. It reads yaml-metadata 
     blocks as defined by pandoc and parses the hyperlinks in each file.

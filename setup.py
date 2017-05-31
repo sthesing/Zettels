@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
-version = '0.2.0'
+version = '0.2.1'
 
 here = path.abspath(path.dirname(__file__))
 
@@ -70,6 +70,8 @@ setup(
     #packages=find_packages(exclude=['contrib', 'docs', 'tests']),
     packages = ['zettels'],
     
+    include_package_data=True,
+    
     # List run-time dependencies here.  These will be installed by pip when
     # your project is installed. For an analysis of "install_requires" vs pip's
     # requirements files see:
@@ -89,7 +91,7 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
-        'zettels': ['resources/*', 'examples/*'],
+        'zettels': ['resources/*'],
     },
 
     # To provide executable scripts, use entry points in preference to the
