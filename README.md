@@ -66,9 +66,10 @@ into software, I can recommend Daniel Lüdecke's [Zettelkasten](http://zettelkas
 
 ## Usage
 
-Run `zettels -h` for a complete list of options. Some examples:
+Run `zettels -h` and `zettels q -h` for a complete list of options. Some 
+examples:
 
-Build or update the index:
+### Build or update the index:
 ```
 zettels
 ```
@@ -129,23 +130,33 @@ The metadata block may contain a variety of other entries (e.g. `author`,
 ignored by Zettels and do not become part of Zettels' index.
 
 ## Output format
-The output of the `query` subcommand can be tweaked to your needs by editing 
-it in the settings file (default: ~/.config/zettels.cfg.yaml).
 
-It's a python format string that receives the title of a zettel and its path 
-as arguments. 
-The default output format is:
+The output of the `query` subcommand can be tweaked to your needs. In the 
+settings file (default: ~/.config/zettels.cfg.yaml), you'll find two settings:
+
+- `outputformat` - standard format
+- `prettyformat` - used when Zettels is called with the `--pretty` flag
+
+These output formats are given as 
+[Python Format Strings](https://docs.python.org/3.6/library/string.html#format-string-syntax).
+Query output consists of two fields that these format strings can process:
+
+    1. title - accessible by `'{0[0]}'`
+    2. path (relative to the Zettelkasten directory) - accessible by `'{0[1]}'`
+
+By default the formats are:
 ```
-'{0[0]:<50}| {0[1]}''
+outputformat: '{0[1]}'
+prettyformat: '{0[0]:<30}| {0[1]}'
 ```
 
-These can be accessed by `{0[0]}` (title) and `{0[1]}` (path).
+Standard `outputformat` just outputs the path(s) of the query results, 
+`prettyformat` is a pseudo-table with the title(s) of the query result in 
+the first column (which is at least 30 characters wide), and the path(s) in 
+the second column.
 
-If you want the output to be e.g. only the path, change the `outputformat` 
-setting to
-```
-{0[1]}
-```
+The output format can also be tweaked on a per call basis with the `-o` flag,
+that takes a custom output format.
 
 See the 
 [Python Format String Syntax](https://docs.python.org/3.6/library/string.html#format-string-syntax) 

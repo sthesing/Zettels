@@ -22,7 +22,7 @@
 Zettels is a command line tool implementing Niklas Luhmann's system of a "Zettelkasten".
 """
 
-__version__ = '0.2.1'
+__version__ = '0.3.0-exp'
 __author__  = 'Stefan Thesing'
 
 # Libraries
@@ -49,9 +49,6 @@ logger = logging.getLogger('Zettels')
 #################################
 
 def _connect_dev_arguments(parser):
-    # Standard settings dir:
-    
-    
     # Command line arguments that are "Developer options" should be available
     # in all subcommands. To make it available to both parser and subparsers,
     # and to avoid redundant code, this function connects them to the specified
@@ -66,7 +63,7 @@ def _connect_dev_arguments(parser):
         you actually use.). Default is "' + settings_base_dir + '/zettels.cfg.yaml"',
         default= settings_base_dir + '/zettels.cfg.yaml')
     group_dev.add_argument('-v', '--verbose', help='Output verbose logging \
-        messages. VERY verbose.',
+        messages to stderr. VERY verbose messages.',
         action="store_true")
 
 def _setup_logging(verbose=False):
@@ -172,6 +169,10 @@ def _query(args):
         outputformat = args.output
     elif args.pretty:
         outputformat = prettyformat
+    # When no Zettel argument is given, this implies the pretty flag, 
+    # but only of -o is not used.
+    elif not args.Zettel:
+        outputformat = prettyformat
       
     if not args.Zettel:
         for entry in zk.get_list_of_zettels(as_output=True, 
@@ -179,10 +180,12 @@ def _query(args):
             print(entry)
     else:
         if not args.followups and not args.targets and not args.incoming:
-            # If no output flag is set, all of them are set.
+            # If no output flag is set, all them get set. The pretty flag
+            # as well.
             args.followups = True
             args.targets = True
             args.incoming = True
+            outputformat = prettyformat
         
         if args.followups:
             print("Followups:")
@@ -227,9 +230,6 @@ def _parse(args):
 #################################
 # Main function                 #
 #################################
-
-if __name__ == "__main__":
-    main()
     
 def main():
     """
@@ -276,7 +276,10 @@ def main():
     group_general.add_argument('Zettel', 
                         metavar='ZETTEL', 
                         nargs='?',
-                        help='Optional: specify a Zettel file.')
+                        help='Optional: specify a Zettel file. If no Zettel \
+                        file is given, zettels will list the titles and \
+                        paths of all the Zettels in the Zettelkasten \
+                        (implying the --pretty flag).')
     group_general.add_argument('-u', '--update', action="store_true",
         help='Update the index before the query.')
     
@@ -295,17 +298,24 @@ def main():
         help='Show all Zettels that link to the specified Zettel.')
     
     # Output format
-    group_format = q_parser.add_mutually_exclusive_group('Output format options', 'Tweak \
-        output format.')
-    group_format.add_argument('-o', '--output', metavar='OUTPUTFORMAT', 
-        help='Specify output format as a python format string. Two fields \
-        can be accessed: title as "{0[0]}" and path as "{0[1]}". Standard \
-        output formats are defined in the settings file.')
+    # It actually should be a mutually exclusive group, but that currently
+    # supports neither title nor description...
+    #group_format = q_parser.add_mutually_exclusive_group()
+    group_format = q_parser.add_argument_group('Output format options', 'Tweak \
+        output format. Output is formatted as a Python Format String, (see \
+        https://docs.python.org/3/library/string.html#format-string-syntax \
+        for details). The output of the query command gives two fields that \
+        can be accessed in this manner: title as "{0[0]}" and path as "{0[1]}". \
+        In the settings file, two output formats are specified: \
+        a standard format and a "pretty" format.')
     group_format.add_argument('-p', '--pretty', action="store_true", 
-        help='Format output as a pseudo table, giving the title(s) of query \
-        result in the first column, path in the second column. Equivalent to \
-        -o "{0[0]:<30}| {0[1]}".')
-    
+        help='Switch output to the pretty format as defined in settings \
+        (Default: "{0[0]:<30}| {0[1]}"). So with default settings, this is \
+        equivalent to -o "{0[0]:<30}| {0[1]}".')
+    group_format.add_argument('-o', '--output', metavar='OUTPUTFORMAT', 
+        help='Override output format settings with OUTPUTFORMAT (a Python \
+        Format String). If this option is used, the --pretty flag is \
+        ignored.')
     
     # Developer options
     _connect_dev_arguments(q_parser)
@@ -324,3 +334,5 @@ def main():
     # subcommand
     args.func(args)
         
+if __name__ == "__main__":
+    main()
