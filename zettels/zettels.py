@@ -57,7 +57,8 @@ def _connect_dev_arguments(parser):
         collections of Zettels (e.g. one for testing the program and one \
         you actually use.). Default is "' + settings_base_dir + '/zettels.cfg.yaml"',
         default= settings_base_dir + '/zettels.cfg.yaml')
-    group_dev.add_argument('-v', '--verbose', help='output verbose logging messages',
+    group_dev.add_argument('-v', '--verbose', help='Output verbose logging \
+        messages. VERY verbose.',
         action="store_true")
 
 def _setup_logging(verbose=False):
@@ -100,7 +101,8 @@ def _read_settings(f):
             indexfile = settings['indexfile']
             indexfile = os.path.abspath(os.path.expanduser(indexfile))
             outputformat = settings['outputformat']
-            return rootdir, indexfile, outputformat
+            prettyformat = settings['prettyformat']
+            return rootdir, indexfile, outputformat, prettyformat
         else:
             print("There seems to be a problem with your settings \
                 file. Zettels expected to receive a dictionary or other \
@@ -127,7 +129,7 @@ def _query(args):
     
     # Next, let's read the settings file. _read_settings(settings) does the
     # error handling
-    rootdir, indexfile, outputformat = _read_settings(args.settings)
+    rootdir, indexfile, outputformat, prettyformat = _read_settings(args.settings)
     # If we're still running, we have valid settings.
     logger.debug("Root dir: " + rootdir)
     logger.debug("Index file: " + indexfile)
@@ -156,7 +158,13 @@ def _query(args):
     # Initialize a Zettelkasten
     zk = Zettelkasten(index, rootdir)
     # Now, let's do what we're told:
-        
+    
+    # Did the user specify a non standard output-format?
+    if args.output:
+        outputformat = args.output
+    elif args.pretty:
+        outputformat = prettyformat
+      
     if not args.Zettel:
         for entry in zk.get_list_of_zettels(as_output=True, 
                                             outputformat=outputformat):
@@ -198,7 +206,7 @@ def _parse(args):
 
     # Next, let's read the settings file. _read_settings(settings) does the
     # error handling
-    rootdir, indexfile, _ = _read_settings(args.settings)
+    rootdir, indexfile, _, _ = _read_settings(args.settings)
     # If we're still running, we have valid settings.
     logger.debug("Root dir: " + rootdir)
     logger.debug("Index file: " + indexfile)
@@ -266,14 +274,28 @@ if __name__ == "__main__":
         determine the output. They only take effect if the ZETTEL argument is \
         given. If none of these flags is set, the program outputs the an \
         overview over the specified Zettel, equivalent to setting all of \
-        these flags.')
+        these flags. Furthermore, setting none of these flags implies the \
+        --pretty flag for output format.')
     group_output.add_argument('-f', '--followups', action="store_true",
         help='Output followups of the specified Zettel.')
     group_output.add_argument('-t', '--targets', action="store_true",
         help='Show the targets of hyperlinks in the specified Zettel.')
     group_output.add_argument('-i', '--incoming', action="store_true",
         help='Show all Zettels that link to the specified Zettel.')
-        
+    
+    # Output format
+    group_format = q_parser.add_mutually_exclusive_group('Output format options', 'Tweak \
+        output format.')
+    group_format.add_argument('-o', '--output', metavar='OUTPUTFORMAT', 
+        help='Specify output format as a python format string. Two fields \
+        can be accessed: title as "{0[0]}" and path as "{0[1]}". Standard \
+        output formats are defined in the settings file.')
+    group_format.add_argument('-p', '--pretty', action="store_true", 
+        help='Format output as a pseudo table, giving the title(s) of query \
+        result in the first column, path in the second column. Equivalent to \
+        -o "{0[0]:<30}| {0[1]}".')
+    
+    
     # Developer options
     _connect_dev_arguments(q_parser)
     

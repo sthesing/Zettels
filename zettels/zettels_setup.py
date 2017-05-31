@@ -31,7 +31,8 @@ def generate_settings():
     # Defaults
     rootdir = os.getcwd()
     indexfile = settings_base_dir + '/index.yaml'
-    outputformat = '{0[0]:<50}| {0[1]}'
+    outputformat = '{0[1]}'
+    prettyformat = '{0[0]:<30}| {0[1]}'
     
     # Ask the user
     
@@ -67,6 +68,7 @@ def generate_settings():
         f.write('rootdir: ' + rootdir + '\n')
         f.write('indexfile: ' + indexfile + '\n')
         f.write('outputformat: \'' + outputformat + '\'')
+        f.write('prettyformat: \'' + prettyformat + '\'')
         f.close()
     
     print("Settings written to '" + os.path.join(settings_base_dir, 'zettels.cfg.yaml') + "'.") 

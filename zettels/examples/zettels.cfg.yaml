@@ -2,4 +2,5 @@
 # see https://github.com/sthesing/Zettels
 rootdir: examples/Zettelkasten
 indexfile: examples/index.yaml
-outputformat: '{0[0]:<50}| {0[1]}'
+outputformat: '{0[1]}'
+prettyformat: '{0[0]:<30}| {0[1]}'
