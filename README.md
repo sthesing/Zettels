@@ -34,6 +34,9 @@ box in a very specific way for his academic work.
 A wonderful introduction in Luhmann's system of a Zettelkasten are the slides
 of a talk by Daniel Lüdecke: [Introduction to Luhmann's Zettelkasten-Thinking](https://strengejacke.wordpress.com/2015/10/07/introduction-to-luhmanns-zettelkasten-thinking-and-its-technical-implementation/)
 
+In Luhmann's own words: [Communicating with Slip Boxes](http://luhmann.surge.sh/communicating-with-slip-boxes) (translation of 
+"Kommunikation mit Zettelkästen").
+
 If you speak German, there's more:
 
 - Luhmann, Niklas (1981): Kommunikation mit Zettelkästen. Ein Erfahrungsbericht. 
