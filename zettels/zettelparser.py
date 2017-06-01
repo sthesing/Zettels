@@ -125,7 +125,6 @@ class Zettelparser:
             # pass it to grep
             grepcmd = "grep --exclude=\"*~\" -n -E -o -f " + patterns_file
             grepoutput = subprocess.check_output(shlex.split(grepcmd) + files)
-        
         return files, grepoutput
     
     @staticmethod    
@@ -210,10 +209,12 @@ class Zettelparser:
                 #because grepoutput is in bytestring format, 
                 #decode it before taking it apart.
                 line = bytes.decode(line)
+                logger.debug("current line of grep output: " + line)
             
                 #In the first partition, we get the filepath
                 #of the occurrence file
                 f, _, rest = line.partition(':')
+                logger.debug("the rest looks like this: " + rest)
                 
                 # Make the path to the file relative to the root directory
                 f = os.path.relpath(f, rootdir)
@@ -224,14 +225,36 @@ class Zettelparser:
                 #for this line
                 ln, _, pat = rest.partition(':')
                 
+                # First occurence for that file? Create an empty
+                # entry
                 if not f in for_yaml:
                     for_yaml[f] = dict(start='', stop='')
                 
                 if pat == "---":
+                # get the line number currently stored for the
+                # pattern
+                    current_ln = for_yaml[f]['start']
+                    # current_ln might be an empty string
+                    if current_ln:
+                        # we want to store the smallest linenumber
+                        # where this pattern occurs
+                        if int(current_ln) < int(ln) : ln = current_ln
+                    # Now let's store that value be it new or old...
+                    logger.debug("Storing start: " + ln)
                     for_yaml[f]['start'] = ln
                 elif pat == "...":
+                # get the line number currently stored for the
+                # pattern
+                    current_ln = for_yaml[f]['stop']
+                    # current_ln might be an empty string
+                    if current_ln:
+                        # we want to store the smallest linenumber
+                        # where this pattern occurs
+                        if int(current_ln) < int(ln) : ln = current_ln
+                    # Now let's store that value be it new or old...
+                    logger.debug("Storing stop: " + ln)
                     for_yaml[f]['stop'] = ln
-                #The rest are hyperlinks. Write the targets 
+                #Other patterns are hyperlinks. Write the targets 
                 #of those to the index
                 else:
                     target = pat.rsplit("(")[1].strip(")")

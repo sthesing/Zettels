@@ -22,7 +22,7 @@
 Zettels is a command line tool implementing Niklas Luhmann's system of a "Zettelkasten".
 """
 
-__version__ = '0.3.0'
+__version__ = '0.4.0'
 __author__  = 'Stefan Thesing'
 
 # Libraries
