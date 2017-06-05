@@ -19,9 +19,10 @@
 Setup tool for Zettels
 """
 import os
+import sys
 import xdg.BaseDirectory
 
-def generate_settings():
+def _generate_settings():
     """
     Interactively generate settings.
     """
@@ -79,6 +80,13 @@ def generate_settings():
     
     print("Settings written to '" + os.path.join(settings_base_dir, 'zettels.cfg.yaml') + "'.") 
     exit()
+
+def generate_settings():
+    try:
+        _generate_settings()
+    except KeyboardInterrupt:
+        print()
+        print("Aborted by user")
 
 if __name__ == "__main__":
     generate_settings()

@@ -91,6 +91,7 @@ class Zettelparser:
             for f in files:
                 if index['files']:
                     #remove files from index that are no longer there
+                    # But isn't this implementation bullshit? TODO
                     if not f in index['files']:
                         del index['files'][f]
                 
@@ -103,6 +104,28 @@ class Zettelparser:
                         files.remove(f)
         
         return files
+    
+    @staticmethod
+    def _get_updated_files_unix(dirname, index=None, ignore_patterns=None):
+        # Variant 1: Get files that have been changed or renamed since
+        # the contents of indexfile have last been modified
+        #cmd = ['find', dirname, '-type', 'f', '-newercm', indexfile]
+        #output = subprocess.check_output(cmd).splitlines()
+        
+        # Variant 2: Git files that have been changed or renamed since
+        # the timestamp in the index.
+        timestamp = '@' + str(int(index['timestamp']))
+        cmd = ['find', dirname, '-type', 'f', '-newerct', timestamp]
+        # TODO (MEMO): should we need to get rid of the ./ at the beginning:
+        # we can pipe it through sed 's/\.\///'
+        
+        output = subprocess.check_output(cmd).splitlines()
+        # TODO: remove entries of files that no longer exist from index 
+        # TODO: ignore pattern (maybe via grep -v) for that:
+        # TODO: switch ignore patterns to regex or find a reliable way
+        #       to translate globs to regex
+        # MEMO: look at fnmatch.translate( '*.foo' )
+        return output
         
     @staticmethod
     def _grep_files(dirname, index=None, ignore_patterns=None):
