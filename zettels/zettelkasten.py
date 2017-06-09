@@ -76,7 +76,7 @@ class Zettelkasten:
         zettel = os.path.relpath(zettel, self.rootdir)
         return self.index['files'][zettel]['title']
     
-    def get_followups_of(self, zettel, as_output=False, outputformat='{0[0]:<50}| {0[1]}'):
+    def get_followups_of(self, zettel, as_output=False, outputformat='{0[0]:<40}| {0[1]}'):
         """
         Get the Followups of a Zettel from the index.
 
@@ -117,7 +117,7 @@ class Zettelkasten:
         
         return followups
     
-    def get_targets_of(self, zettel, as_output=False, outputformat='{0[0]:<50}| {0[1]}'):
+    def get_targets_of(self, zettel, as_output=False, outputformat='{0[0]:<40}| {0[1]}'):
         """
         Get the Targets of a Zettel from the index.
 
@@ -136,9 +136,13 @@ class Zettelkasten:
         
         targets = []
         for target in self.index['files'][zettel]['targets']:
-            target = os.path.normpath(os.path.join(zetdir, target))
-            tup = (self.index['files'][target]['title'], target)
-            
+            # is it an intenal link to another zettel?
+            try:
+                normtarget = os.path.normpath(os.path.join(zetdir, target))
+                tup = (self.index['files'][normtarget]['title'], normtarget)
+            except KeyError:
+                tup = ("External link", target)
+                
             if as_output:
                 targets.append(outputformat.format(tup))
             else:
@@ -149,7 +153,7 @@ class Zettelkasten:
         
         return targets
     
-    def get_incoming_of(self, zettel, as_output=False, outputformat='{0[0]:<50}| {0[1]}'):
+    def get_incoming_of(self, zettel, as_output=False, outputformat='{0[0]:<40}| {0[1]}'):
         """
         Get the Sources of incoming links to a Zettel from the index.
 

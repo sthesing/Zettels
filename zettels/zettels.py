@@ -64,7 +64,7 @@ def _connect_dev_arguments(parser):
         you actually use.). Default is "' + settings_base_dir + '/zettels.cfg.yaml"',
         default= settings_base_dir + '/zettels.cfg.yaml')
     group_dev.add_argument('-v', '--verbose', help='Output verbose logging \
-        messages to stderr. VERY verbose messages.',
+        messages to stdout. VERY verbose messages.',
         action="store_true")
 
 def _setup_logging(verbose=False):
@@ -72,10 +72,12 @@ def _setup_logging(verbose=False):
     
     if verbose:
         logger.setLevel(logging.DEBUG)
+        handler = logging.StreamHandler(sys.stdout)
     else:
         logger.setLevel(logging.INFO)
+        handler = logging.StreamHandler()
     
-    handler = logging.StreamHandler()
+    
     handler.setFormatter(logging.Formatter(
         '%(asctime)s - ' 
         + '%(name)s - '
@@ -230,9 +232,7 @@ def _query(args):
 def _parse(args):
     logger.debug(args)
     
-    
-
-    # Next, let's read the settings file. _read_settings(settings) does the
+    # Read the settings file. _read_settings(settings) does the
     # error handling
     rootdir, indexfile, _, _, ignore_patterns = _read_settings(args.settings)
     # If we're still running, we have valid settings.

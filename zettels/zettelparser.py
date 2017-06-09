@@ -283,7 +283,16 @@ class Zettelparser:
                 #Other patterns are hyperlinks. Write the targets 
                 #of those to the index
                 else:
-                    target = pat.rsplit("(")[1].strip(")")
+                    logger.debug("MD inline link found: " + pat)
+                    # We still have the complete inline link, e.g.
+                    # [Pipes](https://en.wikipedia.org/Pipelines_(Unix))
+                    # We only want the URL-part. The target.
+                    #only the target in parentheses
+                    pat = pat.split("]")[1]
+                    #strip away the front parenthesis
+                    pat = pat.strip("(")
+                    #and the end parenthesis
+                    target = pat.rsplit(")", 1)[0]                    
                     
                     if not target in index['files'][f]['targets']:
                         index['files'][f]['targets'].append(target)
