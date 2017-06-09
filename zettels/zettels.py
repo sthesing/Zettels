@@ -22,7 +22,7 @@
 Zettels is a command line tool implementing Niklas Luhmann's system of a "Zettelkasten".
 """
 
-__version__ = '0.4.0'
+__version__ = '0.5.0'
 __author__  = 'Stefan Thesing'
 
 # Libraries
@@ -50,12 +50,13 @@ logger = logging.getLogger('Zettels')
 
 def _connect_dev_arguments(parser):
     # Command line arguments that are "Developer options" should be available
-    # in all subcommands. To make it available to both parser and subparsers,
-    # and to avoid redundant code, this function connects them to the specified
-    # argument parser.
+    # in subcommands, too. To make it available to both parser and 
+    # eventual subparsers, while avoiding redundant code, this function 
+    # connects them to the parser specified as this function's parameter.
     
-    group_dev = parser.add_argument_group('Developer options', 'These are \
-        probably only useful for developers.')
+    #group_dev = parser.add_argument_group('Developer options', 'These are \
+    #    probably only useful for developers.')
+    group_dev = parser.add_argument_group('Developer options')
     
     group_dev.add_argument('-s', '--settings',  help='relative or absolute \
         path to a settings file. Useful if you have several distinct \
@@ -172,11 +173,11 @@ def _query(args):
     else:
     # If no output flag is set, all them get set. This also implies
     # the pretty flag
-        if not args.followups and not args.targets and not args.incoming:
+        if not args.followups and not args.links and not args.incoming:
             # If no output flag is set, all them get set. The pretty flag
             # as well.
             args.followups = True
-            args.targets = True
+            args.links = True
             args.incoming = True
             args.pretty = True
     
@@ -212,8 +213,8 @@ def _query(args):
                                                  outputformat=outputformat):
                     print(entry)
             
-            if args.targets:
-                if args.pretty: print("[", "- Targets:" , "]")
+            if args.links:
+                if args.pretty: print("[", "- Link targets:" , "]")
                 for entry in zk.get_targets_of(zettel_arg, 
                                                as_output=True,
                                                outputformat=outputformat):
@@ -229,9 +230,7 @@ def _query(args):
 def _parse(args):
     logger.debug(args)
     
-    # First check the --setup argument, because it overrides everything else
-    if args.setup:
-        setup.generate_settings()
+    
 
     # Next, let's read the settings file. _read_settings(settings) does the
     # error handling
@@ -268,28 +267,16 @@ def main():
     parser = argparse.ArgumentParser(description=
         "Zettels is an implementation of Niklas Luhmann's system of a \
         Zettelkasten.")
-    parser.set_defaults(func=_parse)
+    parser.set_defaults(func=_query)
     
     # top-level parameters
-    # Setup
-    group_setup = parser.add_argument_group('Setup option')
-    # The overriding setup flag
-    group_setup.add_argument('--setup',  help='interactively generate a new \
+    parser.add_argument('--setup',  help='interactively generate a new \
         settings file. If this argument is given, all others are ignored.',
         action="store_true")
+    parser.add_argument('-su', '--silentupdate', action="store_true",
+        help='Silently build or update the index and exit.')
     
-    _connect_dev_arguments(parser)
-   
-    # Container for the subparser
-    subparsers = parser.add_subparsers(title="Commands")
-    
-    # Subparser for querying the index
-    q_parser = subparsers.add_parser('query', aliases=['q'], 
-        help='query the Zettelkasten index, run Zettels with \
-            "query --help" for details.')
-    q_parser.set_defaults(func=_query)
-    
-    group_general = q_parser.add_argument_group('General options')
+    group_query = parser.add_argument_group('Query options')
     # One (optional) postional argument, which is a Zettel
     
     if sys.stdin.isatty():
@@ -300,7 +287,7 @@ def main():
         # Piped, let's see what sys.stdin gives us.
         zettel_arg_default = sys.stdin
     
-    group_general.add_argument('Zettel', 
+    group_query.add_argument('Zettel', 
                         metavar='ZETTEL', 
                         nargs='*',
                         default=zettel_arg_default,
@@ -309,19 +296,20 @@ def main():
                         file is given, zettels will list the titles and \
                         paths of all the Zettels in the Zettelkasten \
                         (implying the --pretty flag).')
-    group_general.add_argument('-u', '--update', action="store_true",
+    group_query.add_argument('-u', '--update', action="store_true",
         help='Update the index before the query.')
     
+    
     # Output arguments
-    group_output = q_parser.add_argument_group('Output options', 'Flags to \
+    group_output = parser.add_argument_group('Query output options', 'Flags to \
         determine the output. They only take effect if at least one \
         ZETTEL argument is given. If none of these flags is set, the \
-        program outputs the an overview over the specified Zettel(s), \
+        program outputs an overview over the specified Zettel(s), \
         equivalent to setting all of these flags. Furthermore, this \
         overview implicitly sets the --pretty flag for output format.')
     group_output.add_argument('-f', '--followups', action="store_true",
         help='Output followups of the specified Zettel(s).')
-    group_output.add_argument('-t', '--targets', action="store_true",
+    group_output.add_argument('-l', '--links', action="store_true",
         help='Show the targets of hyperlinks in the specified Zettel(s).')
     group_output.add_argument('-i', '--incoming', action="store_true",
         help='Show all Zettels that link to the specified Zettel(s).')
@@ -330,7 +318,7 @@ def main():
     # It actually should be a mutually exclusive group, but that currently
     # supports neither title nor description...
     #group_format = q_parser.add_mutually_exclusive_group()
-    group_format = q_parser.add_argument_group('Output format options', 'Tweak \
+    group_format = parser.add_argument_group('Output format options', 'Tweak \
         output format. Output is formatted as a Python Format String, (see \
         https://docs.python.org/3/library/string.html#format-string-syntax \
         for details). The output of the query command gives two fields that \
@@ -339,21 +327,30 @@ def main():
         a standard format and a "pretty" format.')
     group_format.add_argument('-p', '--pretty', action="store_true", 
         help='Switch output to the pretty format as defined in settings \
-        (Default: "{0[0]:<30}| {0[1]}"). So with default settings, this is \
-        equivalent to -o "{0[0]:<30}| {0[1]}".')
+        (Default: "{0[0]:<40}| {0[1]}"). So with default settings, this is \
+        equivalent to -o "{0[0]:<40}| {0[1]}".')
     group_format.add_argument('-o', '--output', metavar='OUTPUTFORMAT', 
         help='Override output format settings with OUTPUTFORMAT (a Python \
         Format String). If this option is used, the --pretty flag is \
         ignored.')
     
     # Developer options
-    _connect_dev_arguments(q_parser)
+    #_connect_dev_arguments(q_parser)
+    _connect_dev_arguments(parser)
     
     #################################################
     # Parse and process command line arguments      #
     #################################################
     
     args = parser.parse_args()
+    
+    # First check the --setup argument, because it overrides everything else
+    if args.setup:
+        setup.generate_settings()
+    
+    # Next, see if we're supposed to parse only or query, too.
+    if args.silentupdate:
+        args.func = _parse # default is _query, set in the argparser options.
     
     # Perpare the logger
     logger = _setup_logging(args.verbose)

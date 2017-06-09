@@ -33,7 +33,7 @@ def _generate_settings():
     rootdir = os.getcwd()
     indexfile = settings_base_dir + '/index.yaml'
     outputformat = '{0[1]}'
-    prettyformat = '{0[0]:<30}| {0[1]}'
+    prettyformat = '{0[0]:<40}| {0[1]}'
     ignore = ['*~', '.*']
     
     # Ask the user

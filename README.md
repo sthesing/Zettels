@@ -65,61 +65,59 @@ into software, I can recommend Daniel Lüdecke's [Zettelkasten](http://zettelkas
 
 1. Install using pip (or pip3, depending on your OS): `pip install zettels`
 2. Run `zettels --setup` – follow the interactive setup process
-3. Run `zettels` once without any parameters to initially build the index.
+3. Run `zettels -su` once to initially build the index.
 
 ## Usage
 
-Run `zettels -h` and `zettels q -h` for a complete list of options. Some 
+Run `zettels -h` for a complete list of options. Some 
 examples:
 
 ### Build or update the index:
 ```
-zettels
+zettels -su
 ```
+Shorthand for `--silentupdate`
 
 ### Querying the index
-
-Zettels has the `query` (shorthand `q`) subcommand to query the index.
-
 Show a list of all zettels:
 ```
-zettels query
+zettels
 ```
 Show a list of all zettels, but update the index first:
 ```
-zettels query -u
+zettels -u
 ```
 Show info about a specific zettel, e.g. file1.md:
 ```
-zettels query file1.md
+zettels file1.md
 ```
 Show info about two zettels, e.g. file1.md and file2.md:
 ```
-zettels query file1.md file2.md
+zettels file1.md file2.md
 ```
 Show a list of followups of a specific zettel, e.g. file1.md:
 ```
-zettels query -f file1.md
+zettels -f file1.md
 ```
 Show a list of zettels a specific zettel links to, e.g. file1.md:
 ```
-zettels query -t file1.md
+zettels -l file1.md
 ```
 Show a list of zettels linking to a specific zettel, e.g. file1.md:
 ```
-zettels query -i file1.md
+zettels -i file1.md
 ```
 And finally, a bit of fun with pipes:
 Let's say you want to see which zettels apart from file1.md 
 itself link to the followups of file1.md:
 ```
-zettels query -f file1.md | zettels query -i | grep -v file1.md
+zettels -f file1.md | zettels -i | grep -v file1.md
 ```
 
 ### Try it with example data
 Run e.g.
 ```
-zettels q -s examples/zettels.cfg.yaml examples/Zettelkasten/file1.md
+zettels -s examples/zettels.cfg.yaml examples/Zettelkasten/file1.md
 ```
 
 ## Zettel format
@@ -144,7 +142,7 @@ ignored by Zettels and do not become part of Zettels' index.
 
 ## Output format
 
-The output of the `query` subcommand can be tweaked to your needs. In the 
+The output can be tweaked to your needs. In the 
 settings file (default: ~/.config/zettels.cfg.yaml), you'll find two settings:
 
 - `outputformat` - standard format
@@ -160,12 +158,12 @@ Query output consists of two fields that these format strings can process:
 By default the formats are:
 ```
 outputformat: '{0[1]}'
-prettyformat: '{0[0]:<30}| {0[1]}'
+prettyformat: '{0[0]:<40}| {0[1]}'
 ```
 
 Standard `outputformat` just outputs the path(s) of the query results, 
 `prettyformat` is a pseudo-table with the title(s) of the query result in 
-the first column (which is at least 30 characters wide), and the path(s) in 
+the first column (which is at least 40 characters wide), and the path(s) in 
 the second column.
 
 The output format can also be tweaked on a per call basis with the `-o` flag,

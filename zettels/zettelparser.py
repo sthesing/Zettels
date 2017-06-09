@@ -107,6 +107,9 @@ class Zettelparser:
     
     @staticmethod
     def _get_updated_files_unix(dirname, index=None, ignore_patterns=None):
+        # Not used yet, still experimental and not fully functional. Will
+        # eventually be renamed _get_updated_files and replace that.    
+    
         # Variant 1: Get files that have been changed or renamed since
         # the contents of indexfile have last been modified
         #cmd = ['find', dirname, '-type', 'f', '-newercm', indexfile]
