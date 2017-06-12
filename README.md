@@ -134,11 +134,36 @@ followups: [file.md, subdir/anotherfile.md, ../yetanotherfile.md]
 ...
 ```
 
-Entries in `followups` should be relative to the zettel. The same is true for
-hyperlinks in the zettel body.
+If no such metadata is present, Zettels will replace it with appropriate 
+"empty" values in the index:
+
+- `title`: "untitled"
+- `tags`: "[]"
+- `followups`: "[]"
+
+Instead of finishing the metadata block with `...` you can also use `---`. 
+```{.yaml}
+---
+title:  'Example Zettel'
+tags: [example, question]
+followups: [file.md, subdir/anotherfile.md, ../yetanotherfile.md]
+---
+```
+
+In  fact, a zettel file may contain several YAML-blocks. However, Zettels will 
+only parse the first one. 
 The metadata block may contain a variety of other entries (e.g. `author`, 
 `date`) – maybe for other tools, like pandoc – but those other entries are 
 ignored by Zettels and do not become part of Zettels' index.
+
+To manually link between zettels, use the "inline syntax" for markdown 
+hyperlinks:
+```[.markdown]
+[link text](url)
+```
+
+Links between zettel files should be relative links. The same is true for
+entries in `followups`.
 
 ## Output format
 
