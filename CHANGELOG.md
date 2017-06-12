@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 ### Changed
-
+- Adjusted ignore settings in default settings file to ignore hidden 
+  directories, too.
 ### Deprecated
 ### Removed
 ### Fixed
