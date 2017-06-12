@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 - Adjusted ignore settings in default settings file to ignore hidden 
   directories, too.
+- Properly handling pandoc's specs for YAML metadata, now. Metadata block now 
+  may also end with '---'.
 ### Deprecated
 ### Removed
 ### Fixed

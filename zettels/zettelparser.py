@@ -171,7 +171,7 @@ class Zettelparser:
                 y = ''
                 for i in range(
                     int(for_yaml[f]['start']), 
-                    int(for_yaml[f]['stop'])+1
+                    int(for_yaml[f]['stop'])
                     ):
                     y = y + linecache.getline(f, i)
             
@@ -264,10 +264,25 @@ class Zettelparser:
                     if current_ln:
                         # we want to store the smallest linenumber
                         # where this pattern occurs
-                        if int(current_ln) < int(ln) : ln = current_ln
-                    # Now let's store that value be it new or old...
-                    logger.debug("Storing start: " + ln)
-                    for_yaml[f]['start'] = ln
+                        if int(current_ln) > int(ln):
+                            logger.debug("Storing start: " + ln)
+                            for_yaml[f]['start'] = ln
+                        else:
+                            # we might have a YAML block that ends with
+                            # '---' instead of '...'
+                            current_ln = for_yaml[f]['stop']
+                            # same game
+                            if current_ln:
+                                if int(current_ln) > int(ln):
+                                    logger.debug("Storing stop: " + ln)
+                                    for_yaml[f]['stop'] = ln
+                            else:
+                                logger.debug("Storing stop: " + ln)
+                                for_yaml[f]['stop'] = ln
+                    else:
+                        # Yay, our value is new and shiny! Let's store it!
+                        logger.debug("Storing start: " + ln)
+                        for_yaml[f]['start'] = ln                    
                 elif pat == "...":
                 # get the line number currently stored for the
                 # pattern
@@ -276,10 +291,15 @@ class Zettelparser:
                     if current_ln:
                         # we want to store the smallest linenumber
                         # where this pattern occurs
-                        if int(current_ln) < int(ln) : ln = current_ln
-                    # Now let's store that value be it new or old...
-                    logger.debug("Storing stop: " + ln)
-                    for_yaml[f]['stop'] = ln
+                        # or the second smallest where '---' occurs, which 
+                        # is handled above
+                        if int(current_ln) > int(ln):
+                            logger.debug("Storing stop: " + ln)
+                            for_yaml[f]['stop'] = ln
+                    else:
+                        # Yay, our value is new and shiny! Let's store it!
+                        logger.debug("Storing stop: " + ln)
+                        for_yaml[f]['stop'] = ln
                 #Other patterns are hyperlinks. Write the targets 
                 #of those to the index
                 else:

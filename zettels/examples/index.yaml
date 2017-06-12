@@ -39,4 +39,10 @@ files:
     tags: [example, fourth]
     targets: [../file1.md]
     title: File 4
-timestamp: 1495195313.127109
+  subdir/file5.md:
+    author: Stefan Thesing
+    followups: []
+    tags: []
+    targets: []
+    title: File 5
+timestamp: 1497281891.8940217
