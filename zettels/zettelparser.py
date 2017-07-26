@@ -81,8 +81,8 @@ class Zettelparser:
         return files
         
     @staticmethod
-    def _get_updated_files(dirname, index=None, ignore_patterns=None):
-
+    def _get_updated_files_bak(dirname, index=None, ignore_patterns=None):
+        # Old implementation. Stays here because I'm afraid to delete it, yet.
         
         #Get the current list of files
         files = Zettelparser._list_files(dirname, ignore_patterns)
@@ -106,28 +106,32 @@ class Zettelparser:
         return files
     
     @staticmethod
-    def _get_updated_files_unix(dirname, index=None, ignore_patterns=None):
-        # Not used yet, still experimental and not fully functional. Will
-        # eventually be renamed _get_updated_files and replace that.    
-    
-        # Variant 1: Get files that have been changed or renamed since
-        # the contents of indexfile have last been modified
-        #cmd = ['find', dirname, '-type', 'f', '-newercm', indexfile]
-        #output = subprocess.check_output(cmd).splitlines()
+    def _get_updated_files(dirname, index=None, ignore_patterns=None):
+        # Take care of optional parameters
+        index = index or dict(files=dict())
+        ## Maybe our index has no timestamp, yet.
+        try:
+            timestamp = '@' + str(int(index['timestamp']))
+        except KeyError:
+            timestamp = '@0'
+        ignore_patterns = ignore_patterns or []
         
-        # Variant 2: Git files that have been changed or renamed since
-        # the timestamp in the index.
-        timestamp = '@' + str(int(index['timestamp']))
+        # Prepare ignore_patterns, i.e. reverse them
+        ignore_patterns = Zettelparser._ignorify(ignore_patterns)
+        spec = pathspec.PathSpec.from_lines('gitwildmatch', ignore_patterns)
+                
+        
         cmd = ['find', dirname, '-type', 'f', '-newerct', timestamp]
         # TODO (MEMO): should we need to get rid of the ./ at the beginning:
         # we can pipe it through sed 's/\.\///'
-        
-        output = subprocess.check_output(cmd).splitlines()
+                
+        output = []
+        for line in subprocess.check_output(cmd).splitlines():
+            line = line.decode()
+            if spec.match_file(line):
+                output.append(line)
         # TODO: remove entries of files that no longer exist from index 
-        # TODO: ignore pattern (maybe via grep -v) for that:
-        # TODO: switch ignore patterns to regex or find a reliable way
-        #       to translate globs to regex
-        # MEMO: look at fnmatch.translate( '*.foo' )
+
         return output
         
     @staticmethod

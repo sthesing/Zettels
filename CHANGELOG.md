@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   directories, too.
 - Properly handling pandoc's specs for YAML metadata, now. Metadata block now 
   may also end with '---'.
+- Reimplemented function to find updated files. Should be much faster now, 
+  when dealing with a large number of Zettels. Depending on UNIX tool `find`
+  now, tested against GNU find.
 ### Deprecated
 ### Removed
 ### Fixed

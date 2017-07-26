@@ -201,7 +201,6 @@ for details.
 ## Requirements
 
 - Python 3.x
-- [grep](https://www.gnu.org/software/grep/) – Your Python runtime must be
-able to find and execute grep.
+- [grep](https://www.gnu.org/software/grep/) & [find](https://www.gnu.org/software/findutils)– Your Python runtime must be able to find and execute the UNIX tools `grep` and `find`. Zettels is tested against GNU grep and GNU find, but other implementations should be fine, too.
 - [PyYaml](http://pyyaml.org/)
 - [pathspec](https://pypi.python.org/pypi/pathspec)>=0.5.0
