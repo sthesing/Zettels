@@ -109,6 +109,7 @@ class Zettelparser:
     def _get_updated_files(dirname, index=None, ignore_patterns=None):
         # Take care of optional parameters
         index = index or dict(files=dict())
+        
         ## Maybe our index has no timestamp, yet.
         try:
             timestamp = '@' + str(int(index['timestamp']))
@@ -130,8 +131,7 @@ class Zettelparser:
             line = line.decode()
             if spec.match_file(line):
                 output.append(line)
-        # TODO: remove entries of files that no longer exist from index 
-
+                
         return output
         
     @staticmethod
@@ -140,10 +140,9 @@ class Zettelparser:
         # in the file "zettels-grep-patterns"
         files = Zettelparser._get_updated_files(dirname, index, ignore_patterns)
         
-        # Call grep only, if there are any updated files
-        if not files:
-            grepoutput = None
-        else:
+        # Call grep only if there are any updated files
+        grepoutput = None
+        if files:
             # Path of the patterns file is 
             # [installation directory]/resources/zettels-grep-patterns
             #patterns_file = os.path.join(sys.path[0], 
@@ -153,11 +152,23 @@ class Zettelparser:
             patterns_file = pkg_resources.resource_filename('zettels', 'resources/zettels-grep-patterns')
             
             # pass it to grep
-            grepcmd = "grep --exclude=\"*~\" -n -E -o -f " + patterns_file
-            grepoutput = subprocess.check_output(shlex.split(grepcmd) + files)
+            grepcmd = ['grep', '-n', '-E', '-o', '-f', patterns_file]
+            try:
+                grepoutput = subprocess.check_output(grepcmd + files)
+            except subprocess.CalledProcessError as e:
+                # This may be caused by an empty file
+                if e.returncode == 1 and e.output.decode() == "":
+                    logger.debug("grep returned an error, probably caused by"
+                                +"an empty file:", e)
+                    logger.debug("Carrying on ignoring the file.")
+                else:
+                    raise
+        
+        grepoutput = grepoutput or ""
+        
         return files, grepoutput
     
-    @staticmethod    
+    @staticmethod
     def _parse_metadata(rootdir, for_yaml, index):
         origcwd = os.getcwd()
         os.chdir(rootdir)
@@ -192,6 +203,41 @@ class Zettelparser:
         return index
     
     @staticmethod
+    def _prune_index(rootdir, index):
+        logger.debug("Pruning index...")
+        to_prune = []
+        try:
+            files = index['files']
+            # Make a list of all files in the root directory
+            cmd = ['find', rootdir, '-type', 'f']
+            found_files = subprocess.check_output(cmd).splitlines()
+
+            for entry in files:
+                to_be_compared = os.path.join(rootdir, entry).encode(encoding='UTF-8')
+                logger.debug("Current entry:")
+                logger.debug(to_be_compared)
+                if not to_be_compared in found_files:
+                    logger.error("Current entry is not in found_files. Well be pruned.")
+                    # The file listed in the index doesn't exist anymore.
+                    # Let's remove the entry
+                    to_prune.append(entry)                    
+        except TypeError as e:
+            logger.error("Failed pruning the index. No valid index.", e)
+        except KeyError as e:
+            logger.error("Failed pruning the index. It doesn't contain a "
+                         + "field 'files'", e)
+        
+        for entry in to_prune:
+            del index['files'][entry]
+        
+        logger.debug("After pruning: index looks like this:")
+        logger.debug(index)
+        
+        logger.debug("Pruning index: Done")
+
+        return index
+        
+    @staticmethod
     def update_index(rootdir, index=None, ignore_patterns=None):
         """
         Update/build an index for the specified directory.
@@ -210,12 +256,50 @@ class Zettelparser:
         :return: The index in dictionary format. 
         """
         logger.debug("Updating index:")
+        
+        # Generate a empty index, if necessary
+        # It's necessary if
+        # a) index is None
+        # b) index is not a valid dictionary
+        # c) if the list of files in index is empty
+        
+        built_index_from_scratch = False
+        zfi = [] # zfi: Zettels from index
+        try:
+            zfi = index['files']
+        except (KeyError, TypeError):
+            # index is None or not a dictionary with an entry called files
+            logger.debug("index is none or invalid. Building from scratch.")
+            built_index_from_scratch = True
+            index = dict(files=dict())
+        
+        n = 0
+        try:
+            n = len(zfi)
+        except TypeError:
+            # index['files'] contained something without a length => invalid
+            logger.debug("index is invalid. Building from scratch.")
+            built_index_from_scratch = True
+            index = dict(files=dict())
+        
+        if n == 0:
+            logger.debug("index had an empty list of files. Building from scratch.")
+            built_index_from_scratch = True
+            index = dict(files=dict())
+        
+        logger.debug("Before calling grep, the index looked like this:")
+        if built_index_from_scratch:
+            logger.debug("--Oh, by the way, we built it from scratch.")
+        logger.debug(index)
+        
+        
         # get the list of updated files and the grep output
         files, grepoutput = Zettelparser._grep_files(rootdir, index, ignore_patterns)
-        
-        # generate a empty index, if necessary
-        if not index:
-            index = dict(files=dict())
+        logger.debug("Here's what find and grep returned:")
+        logger.debug("files:")
+        logger.debug(files)
+        logger.debug("grepoutput:")
+        logger.debug(grepoutput)
         
         # generate an empty entry for each updated file, if necessary
         for f in files:
@@ -227,14 +311,16 @@ class Zettelparser:
                                          tags=[], 
                                          followups=[])
         
-        logger.debug("The empty index looks like this:")
+        if built_index_from_scratch:
+            logger.debug("The empty index looks like this:")
+        else:
+            logger.debug("index should be untouched by grep")
         logger.debug(index)
-        
-        #A temporary dict for in which information is 
-        #stored that are needed to parse the metadata
-        for_yaml = dict()
-        
+
         if grepoutput:
+            #A temporary dict for in which information is 
+            #stored that are needed to parse the metadata
+            for_yaml = dict()
             for line in grepoutput.splitlines():
                 #because grepoutput is in bytestring format, 
                 #decode it before taking it apart.
@@ -321,14 +407,21 @@ class Zettelparser:
                     if not target in index['files'][f]['targets']:
                         index['files'][f]['targets'].append(target)
         
-        logger.debug("Before parsing, for_yaml looks like this:")
-        logger.debug(for_yaml)
+            logger.debug("Before parsing, for_yaml looks like this:")
+            logger.debug(for_yaml)
+            
+            logger.debug("Parsing metadata...")
+            # Parse the metadata contained in for_yaml and write it to index
+            index = Zettelparser._parse_metadata(rootdir, for_yaml, index)
+            logger.debug("Parsing metadata...")
         
-        # Parse the metadata contained in for_yaml, write it to index and return
-        # the completed index
-        index = Zettelparser._parse_metadata(rootdir, for_yaml, index)
+        if not built_index_from_scratch:
+            # prune the index
+            index = Zettelparser._prune_index(rootdir, index)
+            
+        # write the timestamp and return the completed index
         index['timestamp'] = time.time()
-        
+                
         logger.debug("Updating index: Done.")
         return index
     
