@@ -5,7 +5,8 @@ indexfile: examples/index.yaml
 outputformat: '{0[1]}'
 prettyformat: '{0[0]:<40}| {0[1]}'
 ignore: {
-    #temporal files, hidden files
+    #temporal files, hidden files, hidden directories
     '*~',
     '.*',
+    '.*/',
 }

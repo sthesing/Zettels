@@ -42,7 +42,7 @@ class Zettelkasten:
     def get_list_of_zettels(self, as_output=False, outputformat='{0[0]:<50}| {0[1]}'):
         """
         Get a list of all Zettels from the index.
-
+        
         :return: A list of Zettels. If as_output is set to True, the list 
             contains strings formated by outputformat. Otherwise, it contains 
             tuples. One tuple for each Zettel in the index.
@@ -87,8 +87,6 @@ class Zettelkasten:
             - Path of the followup relative to rootdir
         """
         # First, absolute path of zettel
-        #zettel = os.path.abspath(zettel)
-        
         # In fact, we need the real path (desolving symlinks)
         zettel = os.path.realpath(zettel)
         logger.debug("Real path to ZETTEL: " + str(zettel))
@@ -119,7 +117,7 @@ class Zettelkasten:
     
     def get_targets_of(self, zettel, as_output=False, outputformat='{0[0]:<40}| {0[1]}'):
         """
-        Get the Targets of a Zettel from the index.
+        Get the targets of a Zettel's hyperlinks from the index.
 
         :param zettel: path to a Zettel file
         :param index: An existing index.
@@ -226,6 +224,27 @@ class Zettelkasten:
         sources.sort()
         
         return sources
+    
+    def get_tags_of(self, zettel, as_output=False, outputformat='{0[0]:<40}| {0[1]}'):
+        """
+        Get the tags of a Zettel from the index.
+
+        :param zettel: path to a Zettel file
+        :param index: An existing index.
+        :return: A list of tags
+        """
+        # First, real path of zettel
+        zettel = os.path.realpath(zettel)
+        
+        # Make the path to the file relative to the root directory
+        zettel = os.path.relpath(zettel, os.path.realpath(self.rootdir))
+        zetdir = os.path.dirname(zettel)
+        
+        tags = []
+        for tag in self.index['files'][zettel]['tags']:
+            tags.append(tag)
+        
+        return tags
     
     def get_zettels_tagged_with(self, tag):
         """This function returns a list of Zettels contained in the index that 

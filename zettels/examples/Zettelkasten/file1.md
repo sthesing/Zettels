@@ -23,4 +23,4 @@ system and returns Buck Rogers to Earth five hundred years later.
 Steve Austin: Astronaut. A man barely alive. Gentlemen... we can rebuild him. 
 We have the technology. We have the [capability](file3.md) to make the world's first bionic 
 man. Steve Austin will be that man. Better than he was before. Better. 
-Stronger. Faster.
+Stronger. Faster. 

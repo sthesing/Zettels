@@ -34,7 +34,7 @@ def _generate_settings():
     indexfile = settings_base_dir + '/index.yaml'
     outputformat = '{0[1]}'
     prettyformat = '{0[0]:<40}| {0[1]}'
-    ignore = ['*~', '.*']
+    ignore = ['*~', '.*', '.*/']
     
     # Ask the user
     
@@ -72,7 +72,7 @@ def _generate_settings():
         f.write('outputformat: \'' + outputformat + '\'\n')
         f.write('prettyformat: \'' + prettyformat + '\'\n')
         f.write('ignore: {\n')
-        f.write('    # temporal files, hidden files\n')
+        f.write('    # temporal files, hidden files, hidden directories\n')
         for p in ignore:
             f.write('    \''+ p + '\',\n')
         f.write('}\n')

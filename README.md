@@ -134,11 +134,36 @@ followups: [file.md, subdir/anotherfile.md, ../yetanotherfile.md]
 ...
 ```
 
-Entries in `followups` should be relative to the zettel. The same is true for
-hyperlinks in the zettel body.
+If no such metadata is present, Zettels will replace it with appropriate 
+"empty" values in the index:
+
+- `title`: "untitled"
+- `tags`: "[]"
+- `followups`: "[]"
+
+Instead of finishing the metadata block with `...` you can also use `---`. 
+```{.yaml}
+---
+title:  'Example Zettel'
+tags: [example, question]
+followups: [file.md, subdir/anotherfile.md, ../yetanotherfile.md]
+---
+```
+
+In  fact, a zettel file may contain several YAML-blocks. However, Zettels will 
+only parse the first one. 
 The metadata block may contain a variety of other entries (e.g. `author`, 
 `date`) – maybe for other tools, like pandoc – but those other entries are 
 ignored by Zettels and do not become part of Zettels' index.
+
+To manually link between zettels, use the "inline syntax" for markdown 
+hyperlinks:
+```[.markdown]
+[link text](url)
+```
+
+Links between zettel files should be relative links. The same is true for
+entries in `followups`.
 
 ## Output format
 
@@ -176,7 +201,6 @@ for details.
 ## Requirements
 
 - Python 3.x
-- [grep](https://www.gnu.org/software/grep/) – Your Python runtime must be
-able to find and execute grep.
+- [grep](https://www.gnu.org/software/grep/) & [find](https://www.gnu.org/software/findutils)– Your Python runtime must be able to find and execute the UNIX tools `grep` and `find`. Zettels is tested against GNU grep and GNU find, but other implementations should be fine, too.
 - [PyYaml](http://pyyaml.org/)
 - [pathspec](https://pypi.python.org/pypi/pathspec)>=0.5.0
