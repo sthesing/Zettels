@@ -79,31 +79,6 @@ class Zettelparser:
             files.append(os.path.join(dirname, match))
         
         return files
-        
-    @staticmethod
-    def _get_updated_files_bak(dirname, index=None, ignore_patterns=None):
-        # Old implementation. Stays here because I'm afraid to delete it, yet.
-        
-        #Get the current list of files
-        files = Zettelparser._list_files(dirname, ignore_patterns)
-        
-        if index:
-            for f in files:
-                if index['files']:
-                    #remove files from index that are no longer there
-                    # But isn't this implementation bullshit? TODO
-                    if not f in index['files']:
-                        del index['files'][f]
-                
-                if index['timestamp']:
-                    #remove all files from the list that 
-                    # a) are in the index already
-                    # and
-                    # b) haven't been modified since the index has last been updated
-                    if (f in index['files']) and (os.stat(f, follow_symlinks=False).st_mtime <= index['timestamp']):
-                        files.remove(f)
-        
-        return files
     
     @staticmethod
     def _get_updated_files(dirname, index=None, ignore_patterns=None):
