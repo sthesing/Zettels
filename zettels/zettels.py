@@ -22,7 +22,7 @@
 Zettels is a command line tool implementing Niklas Luhmann's system of a "Zettelkasten".
 """
 
-__version__ = '0.5.0'
+__version__ = '0.6.0'
 __author__  = 'Stefan Thesing'
 
 # Libraries
@@ -192,7 +192,7 @@ def _query(args):
       
     if not args.Zettel:
         for entry in zk.get_list_of_zettels(as_output=True, 
-                                            outputformat=outputformat):
+                                        outputformat=outputformat):
             print(entry)
     else:
         # In case our zettel arguments came from a pipe via stdin,
@@ -298,7 +298,6 @@ def main():
                         (implying the --pretty flag).')
     group_query.add_argument('-u', '--update', action="store_true",
         help='Update the index before the query.')
-    
     
     # Output arguments
     group_output = parser.add_argument_group('Query output options', 'Flags to \
