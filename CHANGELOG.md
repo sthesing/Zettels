@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## [Unreleased]
 ### Added
 ### Changed
+
+### Deprecated
+### Removed
+### Fixed
+### Security
+
+
+## [0.6.0]
+### Added
+### Changed
 - Adjusted ignore settings in default settings file to ignore hidden 
   directories, too.
 - Properly handling pandoc's specs for YAML metadata, now. Metadata block now 
@@ -17,6 +27,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Deprecated
 ### Removed
 ### Fixed
+- With every run of zettels, the index was built from scratch. Now it only 
+  updates it if files in the Zettelkasten directory have changed.
 ### Security
 
 ## [0.5.0] - 2017-06-09

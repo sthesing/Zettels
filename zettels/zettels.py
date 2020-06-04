@@ -143,26 +143,25 @@ def _query(args):
     logger.debug("Root dir: " + rootdir)
     logger.debug("Index file: " + indexfile)
     
+    logger.debug("Reading index...")
+    try:
+        index = Zettelparser.read_index(indexfile)
+    except FileNotFoundError:
+        logger.error(sys.exc_info()[1])
+        logger.error("If you run Zettels with these settings for the "
+            + "first time, please run it once without any arguments, "
+            + "first. Or set the --update flag.")
+        logger.error("Otherwise, please check your settings or run " 
+            + "Zettels with the --setup parameter to generate new settings.")
+        logger.error("Exiting")
+        exit()
+    logger.debug("Done")
+    
     if args.update:
-        index = Zettelparser.update_index(rootdir, ignore_patterns=ignore_patterns)
+        index = Zettelparser.update_index(rootdir, index, ignore_patterns=ignore_patterns)
         logger.debug("Writing index to file " + indexfile)
         Zettelparser.write_index(index, indexfile)
         logger.debug("Done")
-    else:
-        logger.debug("Reading index...")
-        try:
-            index = Zettelparser.read_index(indexfile)
-        except FileNotFoundError:
-            logger.error(sys.exc_info()[1])
-            logger.error("If you run Zettels with these settings for the "
-                + "first time, please run it once without any arguments, "
-                + "first. Or set the --update flag.")
-            logger.error("Otherwise, please check your settings or run " 
-                + "Zettels with the --setup parameter to generate new settings.")
-            logger.error("Exiting")
-            exit()
-        logger.debug("Done")
-    
     
     # Initialize a Zettelkasten
     zk = Zettelkasten(index, rootdir)
@@ -238,8 +237,9 @@ def _parse(args):
     # If we're still running, we have valid settings.
     logger.debug("Root dir: " + rootdir)
     logger.debug("Index file: " + indexfile)
+    index = Zettelparser.read_index(indexfile)
     
-    index = Zettelparser.update_index(rootdir, ignore_patterns=ignore_patterns)
+    index = Zettelparser.update_index(rootdir, index, ignore_patterns=ignore_patterns)
     logger.debug("Writing index to file " + indexfile)
     Zettelparser.write_index(index, indexfile)
     logger.debug("Done")
