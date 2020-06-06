@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [Unreleased] 
+### Added
+- Migration info
+### Changed
+### Deprecated
+### Removed
+### Fixed
+### Security
+
 ## [0.7.0] Reimplementation announcement
 
 And some old bugfixes
