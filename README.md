@@ -25,10 +25,10 @@ sporting an API that can be used to easily build other user interfaces.
 
 # Questions and answers
 
-## Are users of the old python implementation stuck with the current development status?
+## Are users of the python implementation constrained to existing version?
 
 Essentially yes. I might fix a few critical bugs, but I strongly suggest 
-migrating your Zettelkasten to the new implementation.
+migrating your Zettelkasten to the new Rust port.
 
 ## How can I migrate my existing Zettelkasten to the new implementation?
 
